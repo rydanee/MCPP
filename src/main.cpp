@@ -20,9 +20,9 @@ Camera *cam;
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS) {
-        inputHandler->update(key, true);
+        inputHandler->updateKeys(key, true);
     } else if (action == GLFW_RELEASE) {
-        inputHandler->update(key, false);
+        inputHandler->updateKeys(key, false);
     }
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -30,7 +30,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-
+    inputHandler->updateMouse((float)xpos, (float)ypos, 0);
 }
 
 VAO *vao;
@@ -110,6 +110,7 @@ int main() {
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;

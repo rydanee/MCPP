@@ -27,7 +27,7 @@ glm::mat4 Camera::getProjectionMatrix() {
     return glm::perspective(fovRadians, aspectRatio, 0.1f, 100.0f);
 }
 
-void Camera::update(float dtime, const std::set<int>& pressedKeys, float dx, float dy) {
+void Camera::update(float dtime, const std::set<int>& pressedKeys, float x, float y) {
     if (pressedKeys.contains(GLFW_KEY_W)) {
         position += front * speed * dtime;
     }
@@ -46,19 +46,25 @@ void Camera::update(float dtime, const std::set<int>& pressedKeys, float dx, flo
     if (pressedKeys.contains(GLFW_KEY_LEFT_SHIFT)) {
         position -= up * speed * dtime;
     }
-    if (dx == 0 && dy == 0) return;
+
+    if (firstMove) {
+        lastPos = glm::vec2(x, y);
+        firstMove = false;
+    } else {
+        float dx = x - lastPos.x;
+        float dy = y - lastPos.y;
+        lastPos = glm::vec2(x, y);
+
+        yaw += dx * sensitivity * dtime;
+        pitch -= dy * sensitivity * dtime;
+    }
+
+    pitch = glm::clamp(pitch, -89.0f, 89.0f);
+
+    updateVectors();
 }
 
 void Camera::updateVectors() {
-    if (pitch > 89.0f)
-    {
-        pitch = 89;
-    }
-    else if (pitch < -89)
-    {
-        pitch = -89;
-    }
-
     front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
     front.y = sin(glm::radians(pitch));
     front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));

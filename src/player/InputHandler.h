@@ -11,11 +11,12 @@
 
 class InputHandler {
 public:
-    float dx;
-    float dy;
+    float x;
+    float y;
     std::set<int> pressedKeys = std::set<int>();
 
-    void update(int keycode, bool pressed);
+    void updateKeys(int keycode, bool pressed);
+    void updateMouse(float x, float y, int action);
     void sendFurtherInfo(float dtime, Camera* camera);
 };
 

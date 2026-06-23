@@ -23,7 +23,7 @@ public:
     glm::vec3 getPosition();
     glm::mat4 getProjectionMatrix();
     glm::mat4 getViewMatrix();
-    void update(float dtime, const std::set<int>& pressedKeys, float dx, float dy);
+    void update(float dtime, const std::set<int>& pressedKeys, float x, float y);
 private:
     void updateVectors();
     bool firstMove = true;

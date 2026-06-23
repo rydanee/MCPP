@@ -4,7 +4,9 @@
 
 #include "InputHandler.h"
 
-void InputHandler::update(int keycode, bool pressed) {
+#include <GLFW/glfw3.h>
+
+void InputHandler::updateKeys(int keycode, bool pressed) {
     if (!pressedKeys.contains(keycode) && pressed) {
         pressedKeys.insert(keycode);
     } else if (pressedKeys.contains(keycode) && !pressed) {
@@ -14,6 +16,15 @@ void InputHandler::update(int keycode, bool pressed) {
 
 void InputHandler::sendFurtherInfo(float dtime, Camera *camera) {
     if (camera != nullptr) {
-        camera->update(dtime, pressedKeys, dx, dy);
+        camera->update(dtime, pressedKeys, x, y);
+    }
+}
+
+void InputHandler::updateMouse(float x, float y, int action) {
+    this->x = x;
+    this->y = y;
+
+    if (action == GLFW_MOUSE_BUTTON_1) {
+        //whatever
     }
 }
