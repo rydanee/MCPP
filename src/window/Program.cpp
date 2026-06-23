@@ -42,13 +42,28 @@ Program::Program() {
     const std::string fragShader = readShaderFile("./assets/shaders/default.frag");
     const char* fragShaderCode = fragShader.c_str();
 
+    int success;
+    char infoLog[512];
+
     int vert = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert, 1, &vertShaderCode, NULL);
     glCompileShader(vert);
 
+    glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(vert, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
     int frag = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag, 1, &fragShaderCode, NULL);
     glCompileShader(frag);
+
+    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(frag, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
 
     _handle = glCreateProgram();
     glAttachShader(_handle, vert);
@@ -59,6 +74,14 @@ Program::Program() {
 
 void Program::link() {
     glLinkProgram(_handle);
+
+    int success;
+    char infoLog[512];
+    glGetProgramiv(_handle, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(_handle, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
 }
 
 void Program::dispose() {

@@ -16,8 +16,8 @@ void VAO::addVertexBufferObject(std::vector<float> data) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(mbuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, 0);
-    mbuffers.push_back(vbo);
+    glVertexAttribPointer(mBuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    mBuffers.push_back(vbo);
 }
 
 void VAO::addVertexBufferObject(std::vector<glm::vec3> data) {
@@ -25,8 +25,8 @@ void VAO::addVertexBufferObject(std::vector<glm::vec3> data) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec3), data.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(mbuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, 0);
-    mbuffers.push_back(vbo);
+    glVertexAttribPointer(mBuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    mBuffers.push_back(vbo);
 }
 
 void VAO::addVertexBufferObject(std::vector<glm::vec2> data) {
@@ -34,8 +34,8 @@ void VAO::addVertexBufferObject(std::vector<glm::vec2> data) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec2), data.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(mbuffers.size(), 2, GL_FLOAT, GL_FALSE, 0, 0);
-    mbuffers.push_back(vbo);
+    glVertexAttribPointer(mBuffers.size(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    mBuffers.push_back(vbo);
 }
 
 void VAO::bind() {
@@ -44,16 +44,36 @@ void VAO::bind() {
 
 void VAO::draw(GLenum mode, int count) {
     bind();
-    for (unsigned int i = 0; i < mbuffers.size(); i++) {
+    for (unsigned int i = 0; i < mBuffers.size(); i++) {
         glEnableVertexArrayAttrib(_handle, i);
     }
     glBindBuffer(GL_ARRAY_BUFFER, _handle);
     glDrawArrays(mode, 0, count);
-    for (unsigned int i = 0; i < mbuffers.size(); i++) {
+    for (unsigned int i = 0; i < mBuffers.size(); i++) {
         glDisableVertexArrayAttrib(_handle, i);
     }
 }
 
 VAO::~VAO() {
     glDeleteVertexArrays(1, &_handle);
+}
+
+void VAO::addIndices(std::vector<GLuint> indices) {
+    glGenBuffers(1, &mIndices);
+    mIndicesCount = indices.size();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_DYNAMIC_DRAW);
+}
+
+void VAO::draw(GLenum mode) {
+    bind();
+    for (unsigned int i = 0; i < mBuffers.size(); i++) {
+        glEnableVertexArrayAttrib(_handle, i);
+    }
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndices);
+    glDrawElements(mode, mIndicesCount, GL_UNSIGNED_INT, 0);
+
+    for (unsigned int i = 0; i < mBuffers.size(); i++) {
+        glDisableVertexArrayAttrib(_handle, i);
+    }
 }

@@ -14,11 +14,15 @@ public:
     void addVertexBufferObject(std::vector<float> data);
     void addVertexBufferObject(std::vector<glm::vec3> data);
     void addVertexBufferObject(std::vector<glm::vec2> data);
+    void addIndices(std::vector<GLuint> indices);
     void bind();
     void draw(GLenum mode, int count);
+    void draw(GLenum mode);
     ~VAO();
 private:
-    std::vector<GLuint> mbuffers;
+    std::vector<GLuint> mBuffers;
+    GLuint mIndices;
+    uint mIndicesCount;
     GLuint _handle;
 };
 

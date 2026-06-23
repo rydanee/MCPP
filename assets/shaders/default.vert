@@ -1,9 +1,13 @@
 #version 450 core
 
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 texPos;
 
-uniform float screenRatio;
+uniform float scRatio = 1;
+
+out vec2 texCoord;
 
 void main() {
-    gl_position = vec4(aPos, 1.0f);
+    gl_Position = vec4((aPos.x * scRatio), aPos.y, aPos.z, 1.0f);
+    texCoord = texPos;
 }
