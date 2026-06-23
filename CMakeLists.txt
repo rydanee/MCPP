@@ -13,7 +13,11 @@ add_executable(MCPP src/main.cpp
         src/window/Program.cpp
         src/window/Program.h
         src/window/Texture.cpp
-        src/window/Texture.h)
+        src/window/Texture.h
+        src/player/Camera.cpp
+        src/player/Camera.h
+        src/player/InputHandler.cpp
+        src/player/InputHandler.h)
 
 target_include_directories(MCPP PRIVATE include)
 include_directories(/usr/include/stb)
