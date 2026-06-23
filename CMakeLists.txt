@@ -3,12 +3,20 @@ project(MCPP)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(MCPP src/main.cpp
-        src/window/VAO.cpp
-        src/window/VAO.h)
-
-target_link_libraries(MCPP glfw)
-target_link_libraries(MCPP glm)
-target_link_libraries(MCPP glad)
 find_package(OpenGL REQUIRED)
-target_link_libraries(MCPP OpenGL::GL)
+find_package(glfw3 REQUIRED)
+
+add_executable(MCPP src/main.cpp
+        src/glad.c
+        src/window/VAO.cpp
+        src/window/VAO.h
+        src/window/Program.cpp
+        src/window/Program.h)
+
+target_include_directories(MCPP PRIVATE include)
+
+target_link_libraries(MCPP PRIVATE
+        glfw
+        OpenGL::GL
+        ${CMAKE_DL_LIBS} # Required on Linux for glad to load OpenGL functions
+)
