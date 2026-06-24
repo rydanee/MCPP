@@ -63,3 +63,7 @@ void Texture::use(int tunit) {
 void Texture::unbind() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+GLuint Texture::getTextureID() {
+    return _handle;
+}

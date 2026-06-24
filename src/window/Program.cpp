@@ -36,10 +36,10 @@ std::string readShaderFile(const std::string& filePath) {
 }
 
 
-Program::Program() {
-    const std::string vertShader = readShaderFile("./assets/shaders/default.vert");
+Program::Program(std::string shaderName) {
+    const std::string vertShader = readShaderFile("./assets/shaders/" + shaderName + ".vert");
     const char* vertShaderCode = vertShader.c_str();
-    const std::string fragShader = readShaderFile("./assets/shaders/default.frag");
+    const std::string fragShader = readShaderFile("./assets/shaders/" + shaderName + ".frag");
     const char* fragShaderCode = fragShader.c_str();
 
     int success;

@@ -35,15 +35,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     }
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-        menuFocus = !menuFocus;
-        if (menuFocus) {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        } else {
-            cam->switchFirstMove();
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        }
-    }
 
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 }
@@ -76,12 +67,13 @@ static void onLoad() {
     chunkGenerator = new ChunkGenerator(1234);
 
     cam = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+    cam->initWireFrame();
     model = glm::identity<glm::mat4>();
     projection = cam->getProjectionMatrix();
 
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.0f));
 
-    program = new Program();
+    program = new Program("default");
     texture = TextureManager::getTexture(1);
 
     program->bindAttrib(0, "position");
@@ -111,27 +103,49 @@ static void onLoop() {
     texture->use(GL_TEXTURE0);
 
     chunkGenerator->RenderChunks();
+
+    ChunkGenerator::RaycastResult rayResult = chunkGenerator->Raycast(cam->getPosition(), cam->front, 5.0f);
+
+    if (rayResult.hit) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glLineWidth(5.0f);
+
+        cam->wireframeProgram->use();
+        cam->wireframeProgram->setMatrix4("view", view);
+        cam->wireframeProgram->setMatrix4("projection", projection);
+
+        glm::mat4 outlineModel = glm::identity<glm::mat4>();
+        glm::vec3 centerOffsetPosition = glm::vec3(rayResult.blockPos) + glm::vec3(0.5f, 0.5f, 0.5f);
+        outlineModel = glm::translate(outlineModel, centerOffsetPosition);
+
+        cam->wireframeProgram->setMatrix4("model", outlineModel);
+
+        cam->wireframe->bind();
+
+        glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+
+        glDisable(GL_BLEND);
+    }
 }
 
-void ApplyMinecraftTheme() {
-    ImGuiStyle& style = ImGui::GetStyle();
+void DrawImageCrosshair(GLuint textureID, float width, float height)
+{
+    ImDrawList* drawList = ImGui::GetForegroundDrawList();
 
-    // Disable modern styling smooth elements
-    style.WindowRounding = 0.0f;  // Sharp pixel corners
-    style.FrameRounding = 0.0f;   // Sharp buttons
-    style.PopupRounding = 0.0f;
-    style.WindowBorderSize = 2.0f;       // Thicker retro borders
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImVec2 center = ImVec2(viewport->Pos.x + viewport->Size.x * 0.5f,
+                           viewport->Pos.y + viewport->Size.y * 0.5f);
 
-    // Color Palette setup
-    ImVec4* colors = style.Colors;
-    colors[ImGuiCol_WindowBg]             = ImVec4(0.15f, 0.15f, 0.15f, 0.85f); // Dark transparent inventory backing
-    colors[ImGuiCol_Border]               = ImVec4(0.23f, 0.23f, 0.23f, 1.00f); // Light gray inventory border
-    colors[ImGuiCol_Button]               = ImVec4(0.55f, 0.55f, 0.55f, 1.00f); // Classic gray button background
-    colors[ImGuiCol_ButtonHovered]        = ImVec4(0.65f, 0.65f, 0.90f, 1.00f); // Bluish highlight outline on hover
-    colors[ImGuiCol_ButtonActive]         = ImVec4(0.45f, 0.45f, 0.45f, 1.00f);
-    colors[ImGuiCol_Text]                 = ImVec4(1.00f, 1.00f, 1.00f, 1.00f); // Crisp white text
+    ImVec2 halfSize = ImVec2(width * 0.5f, height * 0.5f);
+    ImVec2 p_min = ImVec2(center.x - halfSize.x, center.y - halfSize.y);
+    ImVec2 p_max = ImVec2(center.x + halfSize.x, center.y + halfSize.y);
+
+    ImTextureID imgID = (ImTextureID)(intptr_t)textureID;
+
+    drawList->AddImage(imgID, p_min, p_max, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
 }
-
 
 int main() {
     inputHandler = new InputHandler();
@@ -159,9 +173,14 @@ int main() {
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    glfwSetCursorPos(window, 1920.0f / 2, 1080.0f / 2);
+
     glEnable(GL_DEPTH_TEST);
     //glDisable(GL_CULL_FACE);
     onLoad();
+
+    Texture *crosshair = new Texture();
+    crosshair->loadFromFile("./assets/UI/crosshair.png");
 
     while (!glfwWindowShouldClose(window))
     {
@@ -178,8 +197,6 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ApplyMinecraftTheme();
-
         ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoTitleBar);
         glm::vec3 plrPos = cam->getPosition();
         ImGui::Text(("X: " + std::to_string(plrPos.x) + " Y:" + std::to_string(plrPos.y) + " Z:" + std::to_string(plrPos.z)).c_str());
@@ -188,8 +205,11 @@ int main() {
 
         ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_NoTitleBar);
         ImGui::Text("Press ESC to exit the game.");
-        ImGui::Text("Press TAB to switch between game GUI and camera rotating.");
         ImGui::End();
+
+        if (crosshair != nullptr) {
+            DrawImageCrosshair(crosshair->getTextureID(), 32, 32);
+        }
 
         if (menuFocus) {
             io.ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
@@ -200,7 +220,6 @@ int main() {
             ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         }
 
         ImGui::Render();

@@ -17,6 +17,7 @@ void VAO::addVertexBufferObject(std::vector<float> data) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_DYNAMIC_DRAW);
     glVertexAttribPointer(mBuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(mBuffers.size());
     mBuffers.push_back(vbo);
 }
 
@@ -26,6 +27,7 @@ void VAO::addVertexBufferObject(std::vector<glm::vec3> data) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec3), data.data(), GL_DYNAMIC_DRAW);
     glVertexAttribPointer(mBuffers.size(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(mBuffers.size());
     mBuffers.push_back(vbo);
 }
 
@@ -35,6 +37,7 @@ void VAO::addVertexBufferObject(std::vector<glm::vec2> data) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec2), data.data(), GL_DYNAMIC_DRAW);
     glVertexAttribPointer(mBuffers.size(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(mBuffers.size());
     mBuffers.push_back(vbo);
 }
 
@@ -44,14 +47,8 @@ void VAO::bind() {
 
 void VAO::draw(GLenum mode, int count) {
     bind();
-    for (unsigned int i = 0; i < mBuffers.size(); i++) {
-        glEnableVertexArrayAttrib(_handle, i);
-    }
     glBindBuffer(GL_ARRAY_BUFFER, _handle);
     glDrawArrays(mode, 0, count);
-    for (unsigned int i = 0; i < mBuffers.size(); i++) {
-        glDisableVertexArrayAttrib(_handle, i);
-    }
 }
 
 VAO::~VAO() {
@@ -67,13 +64,6 @@ void VAO::addIndices(std::vector<GLuint> indices) {
 
 void VAO::draw(GLenum mode) {
     bind();
-    for (unsigned int i = 0; i < mBuffers.size(); i++) {
-        glEnableVertexArrayAttrib(_handle, i);
-    }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndices);
     glDrawElements(mode, mIndicesCount, GL_UNSIGNED_INT, 0);
-
-    for (unsigned int i = 0; i < mBuffers.size(); i++) {
-        glDisableVertexArrayAttrib(_handle, i);
-    }
 }

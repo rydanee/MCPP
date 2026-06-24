@@ -35,7 +35,7 @@ void Chunk::GenerateMesh(const std::vector<ChunkDataDynamic>& allChunkData, int 
                 BlockData::BlockType type = allChunkData[idx][blockIdx];
                 if (type == BlockData::BlockType::AIR) continue;
 
-                glm::vec3 blockPos = position + glm::vec3(x, y, z);
+                glm::vec3 blockPos = position + glm::vec3(x + 0.5f, y + 0.5f, z + 0.5f);
 
                 if (isNeighborEmpty(allChunkData, idx, radius, x - 1, y, z)) {
                     IntegrateFace(BlockData::Faces::LEFT, blockPos);

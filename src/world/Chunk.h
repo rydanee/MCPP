@@ -13,6 +13,13 @@ class Chunk {
     int indexCount = 0;
     using ChunkDataDynamic = std::unique_ptr<BlockData::BlockType[]>;
 public:
+    BlockData::BlockType GetBlockAtLocalPos(int flatIndex) const {
+        if (!blocks || flatIndex < 0 || flatIndex >= (chunkSize * chunkHeight * chunkSize)) {
+            return BlockData::BlockType::AIR;
+        }
+        return blocks[flatIndex];
+    }
+
     Chunk(glm::vec3 pos, int chunkSize, int chunkHeight, ChunkDataDynamic data);
 
     void GenerateMesh(const std::vector<ChunkDataDynamic>& allChunkData, int idx, int radius);

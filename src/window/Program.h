@@ -12,7 +12,7 @@
 
 class Program {
 public:
-    Program();
+    Program(std::string shaderName);
     void link();
     void dispose();
     void bindAttrib(int index, std::string name);

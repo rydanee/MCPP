@@ -12,8 +12,11 @@
 #include <math.h>
 #include <ostream>
 
+#include "window/VAO.h"
+
 Camera::Camera(glm::vec3 position) {
     this->position = position;
+    wireframeProgram = new Program("outline");
 }
 
 glm::vec3 Camera::getPosition() {
@@ -55,8 +58,12 @@ void Camera::update(float dtime, const std::set<int>& pressedKeys, float x, floa
         float dy = y - lastPos.y;
         lastPos = glm::vec2(x, y);
 
+        float aspectRatio = 1920.0f / 1080.0f;
+
         yaw += dx * sensitivity * dtime;
         pitch -= dy * sensitivity * dtime;
+
+        yaw = fmodf(yaw, 360.0f);
     }
 
     pitch = glm::clamp(pitch, -89.0f, 89.0f);
@@ -80,4 +87,27 @@ glm::mat4 Camera::getViewMatrix() {
 
 void Camera::switchFirstMove() {
     firstMove = !firstMove;
+}
+
+void Camera::initWireFrame() {
+    wireframe = new VAO();
+    wireframe->bind();
+
+    std::vector<glm::vec3> boxVertices = {
+        glm::vec3(-0.501f, -0.501f, -0.501f), glm::vec3( 0.501f, -0.501f, -0.501f),
+        glm::vec3( 0.501f,  0.501f, -0.501f), glm::vec3(-0.501f,  0.501f, -0.501f),
+        glm::vec3(-0.501f, -0.501f,  0.501f), glm::vec3( 0.501f, -0.501f,  0.501f),
+        glm::vec3( 0.501f,  0.501f,  0.501f), glm::vec3(-0.501f,  0.501f,  0.501f)
+    };
+
+    std::vector<GLuint> boxIndices = {
+        0, 1, 1, 2, 2, 3, 3, 0,
+        4, 5, 5, 6, 6, 7, 7, 4,
+        0, 4, 1, 5, 2, 6, 3, 7
+    };
+
+    wireframe->addVertexBufferObject(boxVertices);
+    wireframe->addIndices(boxIndices);
+
+    wireframeProgram->bindAttrib(0, "position");
 }

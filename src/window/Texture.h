@@ -14,6 +14,7 @@ public:
     void use(int tunit);
     void bind();
     void unbind();
+    GLuint getTextureID();
 private:
     GLuint _handle;
 };

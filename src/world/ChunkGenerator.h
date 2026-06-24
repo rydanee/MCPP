@@ -12,6 +12,15 @@
 
 class ChunkGenerator {
 public:
+    struct RaycastResult {
+        bool hit = false;
+        glm::ivec3 blockPos{0};
+        glm::ivec3 normal{0};
+    };
+
+    BlockData::BlockType GetBlockAtGlobalPos(const glm::ivec3& globalPos);
+
+    RaycastResult Raycast(const glm::vec3& start, const glm::vec3& direction, float maxDistance);
     ChunkGenerator(int seed);
     static inline const int chunkSize = 16;
     static inline const int chunkHeight = 140;
