@@ -9,6 +9,8 @@
 #include "window/VAO.h"
 #include "window/Program.h"
 #include "window/Texture.h"
+#include "window/TextureManager.h"
+#include "world/ChunkGenerator.h"
 
 static float dtime = 0.0f;
 static long frameCount = 0;
@@ -33,53 +35,39 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
     inputHandler->updateMouse((float)xpos, (float)ypos, 0);
 }
 
-VAO *vao;
 Program *program;
 Texture *texture;
+ChunkGenerator *chunkGenerator;
 
 glm::mat4 model;
 glm::mat4 view;
 glm::mat4 projection;
 
 static void onLoad() {
+    TextureManager::init();
+
+    chunkGenerator = new ChunkGenerator(1234);
+
     cam = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
     model = glm::identity<glm::mat4>();
     projection = cam->getProjectionMatrix();
 
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
 
-    vao = new VAO();
     program = new Program();
-    texture = new Texture();
-    texture->loadFromFile("./assets/textures/hotdog.jpg");
-
-    std::vector<glm::vec3> vertices = {
-        glm::vec3(-0.5f, 0.5f,  0.0f), // bl
-        glm::vec3( 0.5f, 0.5f,  0.0f), // br
-        glm::vec3( 0.5f,  -0.5f,  0.0f),  // tc
-        glm::vec3( -0.5f, -0.5f, 0.0f)
-    };
-    std::vector<glm::vec2> texCoords = {
-        glm::vec2(0.0f, 0.0f),
-        glm::vec2(1.0f, 0.0f),
-        glm::vec2(1.0f, 1.0f),
-        glm::vec2(0.0f, 1.0f)
-    };
-
-    vao->addVertexBufferObject(vertices);
-    vao->addVertexBufferObject(texCoords);
-    vao->addIndices({0, 1, 2, 2, 3, 0});
+    texture = TextureManager::getTexture(1);
 
     program->bindAttrib(0, "position");
     program->bindAttrib(1, "texture");
-    vao->bind();
+
+    chunkGenerator->GenerateChunks();
 }
 
 static void handleFps() {
     float current = (float) glfwGetTime();
     dtime = current - _time;
     _time = current;
-    //std::cout << 1.f / dtime << std::endl;
+    std::cout << 1.f / dtime << std::endl;
 }
 
 static void onLoop() {
@@ -89,14 +77,14 @@ static void onLoop() {
 
     program->setFloat("scRatio", 1080.0 / 1920);
     program->setInt("texture0", 0);
+
+    program->use();
     program->setMatrix4("model", model);
     program->setMatrix4("view", view);
     program->setMatrix4("projection", projection);
-
-    program->use();
     texture->use(GL_TEXTURE0);
 
-    vao->draw(GL_TRIANGLES);
+    chunkGenerator->RenderChunks();
 }
 
 int main() {
@@ -117,6 +105,8 @@ int main() {
         return -1;
     }
 
+    glEnable(GL_DEPTH_TEST);
+    //glDisable(GL_CULL_FACE);
     onLoad();
 
     while (!glfwWindowShouldClose(window))
@@ -124,7 +114,7 @@ int main() {
         handleFps();
         glfwPollEvents();
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         onLoop();
 

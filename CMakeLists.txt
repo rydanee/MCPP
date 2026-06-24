@@ -17,9 +17,17 @@ add_executable(MCPP src/main.cpp
         src/player/Camera.cpp
         src/player/Camera.h
         src/player/InputHandler.cpp
-        src/player/InputHandler.h)
+        src/player/InputHandler.h
+        src/world/BlockData.hpp
+        src/world/ChunkGenerator.cpp
+        src/world/ChunkGenerator.h
+        src/world/Chunk.cpp
+        src/world/Chunk.h
+        src/window/TextureManager.cpp
+        src/window/TextureManager.h)
 
 target_include_directories(MCPP PRIVATE include)
+target_include_directories(MCPP PRIVATE include src)
 include_directories(/usr/include/stb)
 
 target_link_libraries(MCPP PRIVATE

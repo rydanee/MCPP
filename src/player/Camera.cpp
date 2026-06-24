@@ -24,7 +24,7 @@ glm::mat4 Camera::getProjectionMatrix() {
     float fovRadians = glm::radians(fov);
     float aspectRatio = 1920.0 / 1080;
 
-    return glm::perspective(fovRadians, aspectRatio, 0.1f, 100.0f);
+    return glm::perspective(fovRadians, aspectRatio, 0.1f, 5000.0f);
 }
 
 void Camera::update(float dtime, const std::set<int>& pressedKeys, float x, float y) {
