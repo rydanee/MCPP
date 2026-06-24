@@ -48,6 +48,12 @@ target_include_directories(MCPP PRIVATE include src)
 target_include_directories(MCPP PRIVATE ./include/imgui src/imgui)
 include_directories(/usr/include/stb)
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets" #
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
+)
+
 target_link_libraries(MCPP PRIVATE
         glfw
         OpenGL::GL

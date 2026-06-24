@@ -74,7 +74,7 @@ static void onLoad() {
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.0f));
 
     program = new Program("default");
-    texture = TextureManager::getTexture(1);
+    texture = TextureManager::getTexture(0);
 
     program->bindAttrib(0, "position");
     program->bindAttrib(1, "texture");
