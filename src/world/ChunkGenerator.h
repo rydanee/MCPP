@@ -24,7 +24,7 @@ public:
 private:
     int seed;
     float noisescale = 0.0005f;
-    int chunkRadius = 32;
+    int chunkRadius = 16;
     std::vector<std::unique_ptr<Chunk>> chunks;
     int CalculateHeight(int gx, int gy);
 };

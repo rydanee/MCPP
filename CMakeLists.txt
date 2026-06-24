@@ -24,10 +24,28 @@ add_executable(MCPP src/main.cpp
         src/world/Chunk.cpp
         src/world/Chunk.h
         src/window/TextureManager.cpp
-        src/window/TextureManager.h)
+        src/window/TextureManager.h
+        src/imgui/imgui.cpp
+        src/imgui/imgui_demo.cpp
+        src/imgui/imgui_draw.cpp
+        src/imgui/imgui_tables.cpp
+        src/imgui/imgui_widgets.cpp
+        include/imgui/imconfig.h
+        include/imgui/imgui.h
+        include/imgui/imgui_internal.h
+        include/imgui/imstb_rectpack.h
+        include/imgui/imstb_textedit.h
+        include/imgui/imstb_truetype.h
+        include/imgui/imgui_impl_glfw.h
+        src/imgui/imgui_impl_glfw.cpp
+        src/imgui/imgui_impl_opengl3.cpp
+        include/imgui/imgui_impl_opengl3.h
+        include/imgui/imgui_impl_opengl3_loader.h
+        src/player/UI.cpp
+        src/player/UI.h)
 
-target_include_directories(MCPP PRIVATE include)
 target_include_directories(MCPP PRIVATE include src)
+target_include_directories(MCPP PRIVATE ./include/imgui src/imgui)
 include_directories(/usr/include/stb)
 
 target_link_libraries(MCPP PRIVATE

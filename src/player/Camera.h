@@ -24,6 +24,7 @@ public:
     glm::mat4 getProjectionMatrix();
     glm::mat4 getViewMatrix();
     void update(float dtime, const std::set<int>& pressedKeys, float x, float y);
+    void switchFirstMove();
 private:
     void updateVectors();
     bool firstMove = true;

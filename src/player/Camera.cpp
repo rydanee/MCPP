@@ -77,3 +77,7 @@ void Camera::updateVectors() {
 glm::mat4 Camera::getViewMatrix() {
     return glm::lookAt(position, position + front, up);
 }
+
+void Camera::switchFirstMove() {
+    firstMove = !firstMove;
+}
